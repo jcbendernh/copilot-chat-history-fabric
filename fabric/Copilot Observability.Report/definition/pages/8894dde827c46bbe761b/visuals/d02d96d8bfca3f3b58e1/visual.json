@@ -1,0 +1,101 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "d02d96d8bfca3f3b58e1",
+  "position": {
+    "x": 20.37766866388354,
+    "y": 13.289783911228396,
+    "z": 1,
+    "height": 300.34911639376173,
+    "width": 1218.2301918626029,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "conversationtranscript"
+                    }
+                  },
+                  "Property": "conversationstarttime"
+                }
+              },
+              "queryRef": "conversationtranscript.conversationstarttime",
+              "nativeQueryRef": "conversationstarttime"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "conversationtranscript"
+                    }
+                  },
+                  "Property": "bot_conversationtranscriptidname"
+                }
+              },
+              "queryRef": "conversationtranscript.bot_conversationtranscriptidname",
+              "nativeQueryRef": "bot_conversationtranscriptidname"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "conversationtranscript"
+                  }
+                },
+                "Property": "conversationstarttime"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "cc5efa0113f3e401acda",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "conversationtranscript"
+              }
+            },
+            "Property": "conversationstarttime"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "2eac338f63fe3b86b769",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "conversationtranscript"
+              }
+            },
+            "Property": "bot_conversationtranscriptidname"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

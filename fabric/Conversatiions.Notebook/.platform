@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "Conversatiions"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "36d9840a-5ced-be5a-4211-ba2e6f6dcaad"
+  }
+}

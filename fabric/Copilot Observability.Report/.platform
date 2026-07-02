@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Copilot Observability"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4254483f-f051-abc1-41cb-595d580f7f29"
+  }
+}

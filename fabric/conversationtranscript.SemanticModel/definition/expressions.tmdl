@@ -1,0 +1,11 @@
+expression 'DirectLake - dataverse_contosojbend_cds2_workspace_unq1d69ab079f7ff011a7007c1e52172' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/f9f403c2-b93a-416d-a8b1-681c219af03a/3e60fb7c-184c-4a4f-98c1-c101acce54ff", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: a23ac8f2-2247-4ec3-b1d0-4b8472b83625
+
+	annotation PBI_IncludeFutureArtifacts = False
+
+	annotation PBI_RemovedChildren = [{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[TargetMetadata]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[StatusMetadata]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[OptionsetMetadata]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[StateMetadata]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[dbo].[GlobalOptionsetMetadata]"}},"objectType":"Table"}]
+
