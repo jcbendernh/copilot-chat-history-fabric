@@ -1,0 +1,208 @@
+table copilotconversation
+	lineageTag: 32baae07-7ad7-402c-b97a-7fd0efe9b70d
+	sourceLineageTag: [dbo].[copilotconversation]
+
+	column 'Conversation Id'
+		dataType: string
+		lineageTag: c31b9014-c5fd-4c55-be11-1420efb7acb0
+		sourceLineageTag: id
+		summarizeBy: none
+		sourceColumn: id
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Conversation Start DateTime'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 59d07193-aa54-4ceb-84ca-1dcbb23ad0b2
+		sourceLineageTag: conversation_starttime
+		summarizeBy: none
+		sourceColumn: conversation_starttime
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Copilot Agent'
+		dataType: string
+		lineageTag: 76842f0d-86ce-4cd5-89ba-bc50ecccc498
+		sourceLineageTag: bot_conversationtranscriptidname
+		summarizeBy: none
+		sourceColumn: bot_conversationtranscriptidname
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Copilot Agent Id'
+		dataType: string
+		lineageTag: 986bc18a-787e-4938-8030-f9997baab905
+		sourceLineageTag: bot_conversationtranscriptId
+		summarizeBy: none
+		sourceColumn: bot_conversationtranscriptId
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Channel
+		dataType: string
+		lineageTag: 5ef82e19-b045-4445-bc88-56384282c68f
+		sourceLineageTag: channelId
+		summarizeBy: none
+		sourceColumn: channelId
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Conversation Text'
+		dataType: string
+		lineageTag: 03b9c3a2-79a6-436a-9bc6-9b3052e0791c
+		sourceLineageTag: text
+		summarizeBy: none
+		sourceColumn: text
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column conversation_part_timestamp
+		dataType: double
+		isHidden
+		lineageTag: 92cdebe0-91be-4bb2-80c8-708dea3473d9
+		sourceLineageTag: conversation_part_timestamp
+		summarizeBy: sum
+		sourceColumn: conversation_part_timestamp
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'From Entra Object Id'
+		dataType: string
+		lineageTag: 9f10b999-b617-4e36-aa2f-3eccb8487b95
+		sourceLineageTag: from_aadObjectId
+		summarizeBy: none
+		sourceColumn: from_aadObjectId
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'From Id'
+		dataType: string
+		lineageTag: 4bf33ac8-23d8-418f-ae64-3d71a671c4a0
+		sourceLineageTag: from_id
+		summarizeBy: none
+		sourceColumn: from_id
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'From Role'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9cb32fcf-7ec4-4bf6-9960-5740adbc708b
+		sourceLineageTag: from_role
+		summarizeBy: none
+		sourceColumn: from_role
+
+		changedProperty = Name
+
+		changedProperty = SummarizeBy
+
+		annotation SummarizationSetBy = User
+
+	column 'Conversation Part Start DateTime'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dc32565e-8e44-438c-9021-12fa826c6290
+		sourceLineageTag: conversation_part_starttime
+		summarizeBy: none
+		sourceColumn: conversation_part_starttime
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column userid
+		dataType: string
+		isHidden
+		lineageTag: 5a1234b4-c21d-4522-9426-22ea8da6f3d5
+		sourceLineageTag: userid
+		summarizeBy: none
+		sourceColumn: userid
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'User Entra Id'
+		dataType: string
+		lineageTag: 52e6283b-a36c-4ca1-91c6-ebd958c917f5
+		sourceLineageTag: userentraid
+		summarizeBy: none
+		sourceColumn: userentraid
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'User Full Name'
+		dataType: string
+		lineageTag: 2661af8b-54ff-42a2-be54-d59b20e28c6e
+		sourceLineageTag: userfullname
+		summarizeBy: none
+		sourceColumn: userfullname
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'User Email Address'
+		dataType: string
+		lineageTag: dce97a6e-2eb9-4491-aede-8f8e42bb5da6
+		sourceLineageTag: useremailaddress
+		summarizeBy: none
+		sourceColumn: useremailaddress
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column From
+		dataType: string
+		lineageTag: 813db5f1-9ca7-47d1-a36e-48e33513a910
+		sourceLineageTag: from
+		summarizeBy: none
+		sourceColumn: from
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Conversation Start Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9614d131-e6ed-4611-a9e1-6aa9f3195a9a
+		sourceLineageTag: conversation_startdate
+		summarizeBy: none
+		sourceColumn: conversation_startdate
+
+		changedProperty = Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition copilotconversation = entity
+		mode: directLake
+		source
+			entityName: copilotconversation
+			schemaName: dbo
+			expressionSource: 'DirectLake - CopilotObservability'
+

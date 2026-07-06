@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Copilot Chat History"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "23d34aad-27ec-9428-4ce9-722b9581c725"
+  }
+}

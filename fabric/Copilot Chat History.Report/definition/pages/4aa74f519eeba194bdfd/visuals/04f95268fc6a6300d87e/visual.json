@@ -1,0 +1,111 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "04f95268fc6a6300d87e",
+  "position": {
+    "x": 256.72612155142195,
+    "y": 138.37102822602063,
+    "z": 4,
+    "height": 456.88547055761535,
+    "width": 1015.591131696642
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "copilotconversation"
+                    }
+                  },
+                  "Property": "Conversation Part Start DateTime"
+                }
+              },
+              "queryRef": "copilotconversation.Conversation Part Start DateTime",
+              "nativeQueryRef": "Conversation Part Start DateTime"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "copilotconversation"
+                    }
+                  },
+                  "Property": "Channel"
+                }
+              },
+              "queryRef": "copilotconversation.Channel",
+              "nativeQueryRef": "Channel"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "copilotconversation"
+                    }
+                  },
+                  "Property": "From"
+                }
+              },
+              "queryRef": "copilotconversation.From",
+              "nativeQueryRef": "From"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "copilotconversation"
+                    }
+                  },
+                  "Property": "Conversation Text"
+                }
+              },
+              "queryRef": "copilotconversation.Conversation Text",
+              "nativeQueryRef": "Conversation Text"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "copilotconversation"
+                  }
+                },
+                "Property": "Conversation Part Start DateTime"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

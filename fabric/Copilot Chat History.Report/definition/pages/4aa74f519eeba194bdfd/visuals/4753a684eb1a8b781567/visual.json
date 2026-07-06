@@ -1,0 +1,69 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "4753a684eb1a8b781567",
+  "position": {
+    "x": 9.5728384307309877,
+    "y": 138.37102822602063,
+    "z": 1,
+    "height": 456.88547055761535,
+    "width": 237.58044468995996
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "copilotconversation"
+                    }
+                  },
+                  "Property": "Conversation Start DateTime"
+                }
+              },
+              "queryRef": "copilotconversation.Conversation Start DateTime",
+              "nativeQueryRef": "Conversation Start DateTime"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "copilotconversation"
+                  }
+                },
+                "Property": "Conversation Start DateTime"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

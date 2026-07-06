@@ -1,0 +1,9 @@
+expression 'DirectLake - CopilotObservability' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/f9f403c2-b93a-416d-a8b1-681c219af03a/ca4fe890-3553-443c-8f8b-9b85448a6c1f", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: 16e5289b-ab49-489a-95d0-0613b6dc4e11
+
+	annotation PBI_IncludeFutureArtifacts = False
+
