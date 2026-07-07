@@ -1,4 +1,4 @@
-# Copilot Conversation Chat History
+# Copilot Studio Agents - Conversation Chat History using Microsoft Fabric
 
 ## Overview
 For many Copilot Studio makers and administrators, pulling conversation transcript data from Dataverse and navigating Application Insights and Azure Log Analytics can be challenging. 
