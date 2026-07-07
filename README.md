@@ -24,4 +24,4 @@ This repository contains the following items that will be deposited into your wo
 - **Copilot Chat History Semantic Model**: This converts the fields names, listed in the  dbo.copilotconversation delta table in the CopilotObservability lakehouse ,and makes them user friendly for reporting purposes.
 - **Copilot Chat History Report**: This utilizes the Copilot Chat History Semantic Model and has 2 major components.
     - **Conversation Summary Page**: This is a high level dashboard that shows the shows the overall conversation history for a specific time period.  You can view this by the individual Copilot Studio Agent and also the channel it is published to.  You can also drill through into any Copilot Studio Agent to see more detail on the COnversation Detail Page.
-    - **Conversation Detail Page**: - This provides you the ability to view each individual conversation and see the conversation history between the user and the agent.
+    - **Conversation Detail Page**: This provides you the ability to view each individual conversation and see the conversation history between the user and the agent.
