@@ -22,7 +22,7 @@ Below are sample screenshots of the report.
 ## Fabric Workspace Components
 This repository contains the following items in the fabric subfolder, which will be deployed to your workspace when you perform the Source Control Update:
 - **CopilotObservability**: A Lakehouse with schema enabled.
-- **Conversations**: This notebook transforms data from the Dataverse shortcut Lakehouse (specifically the ConversationTranscript and User tables) and inserts it into the dbo.copilotconversation delta table in the CopilotObservability Lakehouse. You need to update one variable in the notebook to point to your Dataverse Lakehouse.
+- **Conversations**: This notebook transforms data from the Dataverse shortcut Lakehouse (specifically the ConversationTranscript and User tables) and inserts it into the dbo.copilotconversation delta table in the CopilotObservability Lakehouse. You need to update one variable in the notebook to point to your Dataverse Lakehouse.  This notebook can be scheduled to run on an interim basis. 
 - **Copilot Chat History Semantic Model**: This semantic model transforms field names from the dbo.copilotconversation delta table into user-friendly names for reporting purposes.
 - **Copilot Chat History Report**: This report uses the Copilot Chat History Semantic Model and contains two main pages:
     - **Conversation Summary Page**: A high-level dashboard showing overall conversation history for a specified time period. You can filter by individual Copilot Studio agent and communication channel. You can also drill through to any agent to see more details on the Conversation Detail page.
