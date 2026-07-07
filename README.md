@@ -18,7 +18,7 @@ Thus, I created this repo that allows you to easily view the Copilot Conversatio
 
 
 ## Fabric Workspace Components
-This repository contains the following items that will be deposited into your workspace once you perform the Update via Source Control referenced above.
+This repository contains the following items, in the fabric subfolder, that will be deposited into your workspace once you perform the Update via Source Control referenced above.
 - **CopilotObservability**: Lakehouse with schema enabled.
 - **Conversations**: This notebook takes the data contained in the conversationtranscript and systemuser tables of the dataverse shortcutted lakehouse and transforms and simplifies the complex nature of the columns needed and insert them into the dbo.copilotconversation delta table in the CopilotObservability lakehouse.  There is one variable to update in the notebook to point to the information to your shortcutted Dataverse lakehouse.
 - **Copilot Chat History Semantic Model**: This converts the fields names, listed in the  dbo.copilotconversation delta table in the CopilotObservability lakehouse ,and makes them user friendly for reporting purposes.
