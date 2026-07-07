@@ -1,7 +1,5 @@
 # Copilot Conversation Chat History
 
-**Under Construction**
-
 ## Overview
 For many Copilot Studio makers and administrators it can be challenging to pull the conversation transcript data from Dataverse and understanding Application Insights and Log Analytics in Azure may be "a bridge too far".  
 
