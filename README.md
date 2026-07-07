@@ -1,27 +1,25 @@
 # Copilot Conversation Chat History
 
 ## Overview
-For many Copilot Studio makers and administrators it can be challenging to pull the conversation transcript data from Dataverse and understanding Application Insights and Log Analytics in Azure may be "a bridge too far".  
-
-Thus, I created this repo that allows you to easily view the Copilot Conversation History in a Power BI report within a Fabric Workspace.  Below are some screenshots for reference.
+For many Copilot Studio makers and administrators, pulling conversation transcript data from Dataverse and navigating Application Insights and Azure Log Analytics can be challenging. To address this, I created this repository, which allows you to easily view your Copilot conversation history in a Power BI report within a Fabric Workspace. Below are sample screenshots.
 
 ![Conversation Summary](img/conversationsummary.png)
 ![Conversation Detail](img/conversationdetail.png)
 
 
 ## To get started, please perform the following:
-1. Create a brand new Fabric Workspace.  I named mine Copilot Observability.
-2. Clone this repo to your GitHub environment.
-3. Add your newly cloned GitHub repo to your Fabric Workspace environment via the Git integration under Workspace settings. For more on this topic, check out [Connect a workspace to a Git repo - GitHub Connect](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-get-started?tabs=azure-devops%2CGitHub%2Ccommit-to-git#connect-a-workspace-to-a-git-repo).
-4. Within your Fabric Workspace, perform an Update under Source Control to pull the Lakehouse, Notebook, Semantic Model and Power BI report into your newly created workspace.  For more on this topic, check out [Basic concepts in Git integration - Commits and updates](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-integration-process?tabs=Azure%2Cazure-devops#commits-and-updates).
-5. Setup the Dataverse Link to Microsoft Fabric to shortcut the following tables: **ConversationTranscript** (conversationtranscript) and **User** (systemsuer) into the Fabric Workspace that you created in step 1 above.  When finished, you should have a new lakehouse in your workspace that has a name that begins with dataverse.  For more on this topic check out the following article [Link to Microsoft Fabric](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/fabric-link-to-data-platform).  
+1. Create a new Fabric Workspace (for example, "Copilot Observability").
+2. Clone this repository to your GitHub environment.
+3. Add your cloned repository to your Fabric Workspace via Git integration under Workspace settings. For more information, see [Connect a workspace to a Git repo](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-get-started?tabs=azure-devops%2CGitHub%2Ccommit-to-git#connect-a-workspace-to-a-git-repo).
+4. In your Fabric Workspace, perform an Update under Source Control to pull the Lakehouse, Notebook, Semantic Model, and Power BI report into your workspace. For more information, see [Basic concepts in Git integration - Commits and updates](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-integration-process?tabs=Azure%2Cazure-devops#commits-and-updates).
+5. Set up the Dataverse Link to Microsoft Fabric to create shortcuts to the following tables: **ConversationTranscript** (conversationtranscript) and **User** (systemuser) in your Fabric Workspace. When finished, a new lakehouse beginning with "dataverse" will appear in your workspace. For more information, see [Link to Microsoft Fabric](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/fabric-link-to-data-platform).  
 
 
 ## Fabric Workspace Components
-This repository contains the following items, in the fabric subfolder, that will be deposited into your workspace once you perform the Update via Source Control referenced above.
-- **CopilotObservability**: Lakehouse with schema enabled.
-- **Conversations**: This notebook takes the data contained in the conversationtranscript and systemuser tables of the dataverse shortcutted lakehouse and transforms and simplifies the complex nature of the columns needed and insert them into the dbo.copilotconversation delta table in the CopilotObservability lakehouse.  There is one variable to update in the notebook to point to the information to your shortcutted Dataverse lakehouse.
-- **Copilot Chat History Semantic Model**: This converts the fields names, listed in the  dbo.copilotconversation delta table in the CopilotObservability lakehouse ,and makes them user friendly for reporting purposes.
-- **Copilot Chat History Report**: This utilizes the Copilot Chat History Semantic Model and has 2 major components.
-    - **Conversation Summary Page**: This is a high level dashboard that shows the shows the overall conversation history for a specific time period.  You can view this by the individual Copilot Studio Agent and also the channel it is published to.  You can also drill through into any Copilot Studio Agent to see more detail on the COnversation Detail Page.
-    - **Conversation Detail Page**: This provides you the ability to view each individual conversation and see the conversation history between the user and the agent.
+This repository contains the following items in the fabric subfolder, which will be deployed to your workspace when you perform the Source Control Update:
+- **CopilotObservability**: A Lakehouse with schema enabled.
+- **Conversations**: This notebook transforms data from the Dataverse shortcut Lakehouse (specifically the ConversationTranscript and User tables) and inserts it into the dbo.copilotconversation delta table in the CopilotObservability Lakehouse. You need to update one variable in the notebook to point to your Dataverse Lakehouse.
+- **Copilot Chat History Semantic Model**: This semantic model transforms field names from the dbo.copilotconversation delta table into user-friendly names for reporting purposes.
+- **Copilot Chat History Report**: This report uses the Copilot Chat History Semantic Model and contains two main pages:
+    - **Conversation Summary Page**: A high-level dashboard showing overall conversation history for a specified time period. You can filter by individual Copilot Studio agent and communication channel. You can also drill through to any agent to see more details on the Conversation Detail page.
+    - **Conversation Detail Page**: Displays individual conversations and shows the conversation history between users and the agent.
