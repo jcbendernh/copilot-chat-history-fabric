@@ -2,11 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
     "type": "Notebook",
-    "displayName": "Conversatiions - Incremental Load",
-    "description": "New notebook"
+    "displayName": "Conversations - Initial Ingest"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "0df60c1a-68f1-b6e5-4751-9fc8bfd15ea8"
+    "logicalId": "36d9840a-5ced-be5a-4211-ba2e6f6dcaad"
   }
 }
