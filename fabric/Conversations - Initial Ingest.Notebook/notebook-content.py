@@ -72,9 +72,9 @@ display(ct_df)
 # MARKDOWN ********************
 
 # ### Parse JSON `content` column and flatten top-level fields
-# Samples a non-null JSON value from the `content` column, infers its schema, parses it into a struct (`content_json`), and flattens its top-level fields into `parsed_df` while keeping key transcript metadata (`id`, `conversation_starttime`, `conversation_startdate`, `bot_conversationtranscriptidname`, `bot_conversationtranscriptId`).
+# Samples a non-null JSON value from the `content` column, infers its schema, and parses it into a struct column (`content_json`). It then flattens the top-level JSON fields into `parsed_df` (for example, the `activities` array) while keeping key transcript metadata (`id`, `conversation_starttime`, `conversation_startdate`, `bot_conversationtranscriptidname`, `bot_conversationtranscriptId`).
 # 
-# If no non-null JSON values are found in `content`, the code skips JSON parsing and simply returns a `parsed_df` that contains only the basic conversation metadata columns.
+# If no non-null JSON values are found in `content`, the code skips JSON parsing and instead builds a `parsed_df` that contains only a minimal set of conversation metadata columns sourced directly from `ct_df`.
 
 # CELL ********************
 
@@ -126,9 +126,9 @@ display(parsed_df)
 # MARKDOWN ********************
 
 # ### Detect and explode array field for conversation parts
-# Automatically detects array-type columns in `parsed_df`, chooses the **first** array column as the conversation-parts container, explodes it to create one row per conversation part, filters to only `type == "message"`, and stores the result as `conversation_df` with a `conversation_part_json` struct column.
+# Inspects `parsed_df` for array-type columns (such as the `activities` array that holds turn-by-turn conversation data), selects the first such column as the conversation-parts container, and explodes it to create one row per conversation part. It then filters to only those elements where `conversation_part.type == "message"` and stores the result as `conversation_df` with a `conversation_part_json` struct column.
 # 
-# If no array-type columns are present in `parsed_df`, the code leaves the data unmodified and assigns `conversation_df = parsed_df`.
+# If no array-type columns are present in `parsed_df`, the code leaves the data unmodified and simply sets `conversation_df = parsed_df`.
 
 # CELL ********************
 
@@ -330,8 +330,8 @@ spark.sql(f"REFRESH TABLE dbo.copilotconversation")
 
 # MARKDOWN ********************
 
-# ### Capture the current (latest) version of the source table.
-# Gets the current version of the source table and store the baseline version as a table property on the target for the incremental notebook to reference
+# ### Capture the current version of the source table for incremental processing
+# Retrieves the latest Delta version of the source `{lakehousename}.conversationtranscript` table and saves it as a `cdf.baseline_version` table property on `copilotconversation`. This baseline is used by the incremental notebook so that future runs only process changes from `startingVersion = baseline_version + 1` onward.
 
 # CELL ********************
 

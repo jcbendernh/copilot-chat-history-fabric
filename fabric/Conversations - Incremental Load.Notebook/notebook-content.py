@@ -26,8 +26,8 @@
 
 # MARKDOWN ********************
 
-# ### Parameters – Lakehouse name
-# Sets the `lakehousename` variable used to build SQL queries against the Dataverse Lakehouse.
+# ### Parameter – Dataverse Lakehouse name
+# Defines the `lakehousename` string used to build SQL queries against the Dataverse Lakehouse (e.g. `conversationtranscript`, `systemuser`).
 
 # PARAMETERS CELL ********************
 
@@ -42,8 +42,8 @@ lakehousename = "dataverse_contosojbend_cds2_workspace_unq1d69ab079f7ff011a7007c
 
 # MARKDOWN ********************
 
-# ### Load to Curated & Advance Checkpoint
-# Append the transformed records to the gold target table, then update the stored baseline version so the next run picks up only newer changes.
+# ### Initialize CDF baseline and compute start version
+# Reads the `cdf.baseline_version` table property from the curated `copilotconversation` table, validates that an initial baseline exists, and derives `start_version` (baseline + 1) that will be used to read new changes from Dataverse CDF.
 
 # CELL ********************
 
@@ -70,9 +70,7 @@ print(f"Reading CDF from '{lakehousename}'.conversationtranscript starting at ve
 # MARKDOWN ********************
 
 # ### Read Change Data Feed from source
-# Reads the Delta Change Data Feed from `{lakehousename}.conversationtranscript` starting at `start_version` (one above the stored baseline). The CDF reader returns all change records along with metadata columns (`_change_type`, `_commit_version`, `_commit_timestamp`).
-# 
-# If no change records are found (count == 0), the notebook exits early via `dbutils.notebook.exit()` to avoid unnecessary processing downstream.
+# Uses Delta Change Data Feed to read new changes from `{lakehousename}.conversationtranscript` starting at `start_version`, based on the current table history, and exits the notebook early via `notebookutils.notebook.exit()` when there are no new change records to process.
 
 # CELL ********************
 
@@ -118,8 +116,8 @@ if change_count == 0:
 
 # MARKDOWN ********************
 
-# ### Filter for insert records and select columns
-# Filters `cdf_df` to retain only rows where `_change_type == "insert"` — updates and deletes are not expected in this pipeline. Projects the key metadata columns (`id`, `conversation_starttime`, `conversation_startdate`, `bot_conversationtranscriptidname`, `bot_conversationtranscriptId`, `content`) and wraps the `content` string column in a single-element `array()` so the downstream JSON parsing cell can uniformly index it as `content[0]`, matching the initial load structure.
+# ### Filter for insert records and select core transcript columns
+# Filters `cdf_df` to retain only rows where `_change_type == "insert"` (this pipeline ignores updates/deletes), and projects the main transcript metadata (`id`, conversation start time/date, bot name/ID) plus the raw JSON `content` column into `upsert_df` for downstream JSON parsing.
 
 # CELL ********************
 
@@ -150,10 +148,8 @@ display(upsert_df)
 
 # MARKDOWN ********************
 
-# ### Parse JSON `content` column and flatten top-level fields
-# Samples a non-null JSON value from the `content` column, infers its schema, parses it into a struct (`content_json`), and flattens its top-level fields into `parsed_df` while keeping key transcript metadata (`id`, `conversation_starttime`, `conversation_startdate`, `bot_conversationtranscriptidname`, `bot_conversationtranscriptId`).
-# 
-# If no non-null JSON values are found in `content`, the code skips JSON parsing and simply returns a `parsed_df` that contains only the basic conversation metadata columns.
+# ### Parse JSON `content` and flatten top-level fields
+# Samples a non-null JSON string from `content` to infer its schema, parses `content` into a struct (`content_json`), and flattens its top-level fields into `parsed_df` alongside conversation metadata. If no non-null JSON values exist, it falls back to a minimal `parsed_df` containing only the basic metadata columns.
 
 # CELL ********************
 
@@ -204,9 +200,7 @@ display(parsed_df)
 # MARKDOWN ********************
 
 # ### Detect and explode array field for conversation parts
-# Automatically detects array-type columns in `parsed_df`, chooses the **first** array column as the conversation-parts container, explodes it to create one row per conversation part, filters to only `type == "message"`, and stores the result as `conversation_df` with a `conversation_part_json` struct column.
-# 
-# If no array-type columns are present in `parsed_df`, the code leaves the data unmodified and assigns `conversation_df = parsed_df`.
+# Inspects `parsed_df` to find array-type columns, chooses the first such column as the conversation-parts container (e.g., activities/messages), explodes it into one row per conversation part, filters to `type == "message"`, and stores the nested struct as `conversation_part_json`. If no array-type columns are present, it simply passes `parsed_df` through unchanged as `conversation_df`.
 
 # CELL ********************
 
@@ -268,7 +262,7 @@ display(conversation_df)
 # MARKDOWN ********************
 
 # ### Extract message-level fields from `conversation_part_json`
-# Projects key fields out of the `conversation_part_json` struct (channel, text, sender details, timestamp), converts the epoch timestamp to a proper Spark `timestamp`, orders messages by newest first, and produces `conversation_df_with_fields` while keeping the original `conversation_part_json` struct for further exploration if needed.
+# Projects key fields from the `conversation_part_json` struct (channel, text, sender AAD object ID, sender role, timestamp), converts the epoch timestamp into a proper Spark `timestamp`, and produces `conversation_df_with_fields` ordered by most recent message first.
 
 # CELL ********************
 
@@ -313,8 +307,8 @@ display(conversation_df_with_fields)
 
 # MARKDOWN ********************
 
-# ### Load system user data
-# Queries the Dataverse `systemuser` table in the same Lakehouse to retrieve user identity information (AAD object ID, full name, email) into `user_df`. Only rows with a non-null `azureactivedirectoryobjectid` are loaded so that they can be joined reliably with conversation messages later.
+# ### Load system user data from Dataverse
+# Queries the Dataverse `systemuser` table in the same Lakehouse to retrieve user identity attributes (AAD object ID, full name, email) into `user_df`, filtering to rows with a non-null `azureactivedirectoryobjectid` so they can be reliably joined to conversation messages.
 
 # CELL ********************
 
@@ -332,11 +326,7 @@ display(user_df)
 # MARKDOWN ********************
 
 # ### Join conversations with user details and derive friendly sender name
-# Renames key user columns in `user_df`, left-joins `conversation_df_with_fields` with user data using the AAD object ID (`from_aadObjectId` ⇔ `userentraid`), and constructs a readable `from` field:
-# - Bot messages (`from_role == 0`) show the bot name (`bot_conversationtranscriptidname`)
-# - User messages (`from_role == 1`) show the user full name from Dataverse (`userfullname`).
-# 
-# The code also adds a `from_icon` column (🤖 for bot, 👤 for user) and stores the result in `conversation_with_user`.
+# Renames key user columns in `user_df`, left-joins `conversation_df_with_fields` to user data on AAD object ID, and builds readable sender columns: `from` (bot name or user full name) and `from_icon` (🤖 for bot, 👤 for user), resulting in the enriched `conversation_with_user` DataFrame.
 
 # CELL ********************
 
@@ -385,8 +375,8 @@ display(conversation_with_user)
 
 # MARKDOWN ********************
 
-# ### Persist enriched conversation data
-# Writes the `conversation_with_user` DataFrame as a managed Delta table named `copilotconversation` in the default Lakehouse (`CopilotObservability`), overwriting any existing table with that name and allowing schema evolution via `overwriteSchema = true`. After writing, it issues a `REFRESH TABLE dbo.copilotconversation` to make sure downstream queries see the latest metadata and data.
+# ### Persist enriched conversation data to curated table
+# Appends the `conversation_with_user` DataFrame to the managed Delta table `copilotconversation` in the default Lakehouse (`CopilotObservability`) and refreshes `dbo.copilotconversation` so downstream queries see the latest schema and data.
 
 # CELL ********************
 
@@ -406,7 +396,7 @@ spark.sql(f"REFRESH TABLE dbo.copilotconversation")
 # MARKDOWN ********************
 
 # ### Advance CDF baseline checkpoint
-# Captures the current (latest) version of the source table via `DESCRIBE HISTORY` and stores it as the `cdf.baseline_version` table property on the target table. The next incremental run will read CDF starting at this version + 1, ensuring no changes are double-processed or missed.
+# Finds the latest version of `{lakehousename}.conversationtranscript` via `DESCRIBE HISTORY` and updates the `copilotconversation` table property `cdf.baseline_version` to that version so the next incremental run starts from the correct point and does not reprocess prior changes.
 
 # CELL ********************
 
