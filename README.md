@@ -10,6 +10,25 @@ Below are sample screenshots of the report.
 ![Conversation Summary](img/conversationsummary.png)
 ![Conversation Detail](img/conversationdetail.png)
 
+### High Level Architecture and Process Flow
+```mermaid
+flowchart TD
+	A[Create Fabric Workspace] 
+	B[Connect Git repo to Workspace]
+	C[Deploy workspace artifacts via Source Control in Git]
+	D[Set up Dataverse Link to Fabric<BR>Dataverse shortcut tables available in Fabric]
+	E[Run Initial Ingest Notebook<BR>Transform and load to<br/>curated Delta table]
+    F[Conversations Table<br/>Curated analytics-ready conversation history]
+	G[Schedule Incremental Load Notebook<BR>Append only new conversation records]
+	H[Semantic Model maps fields<br/>to report-friendly names]
+    I[Copilot Chat History Report<br/>Summary and Detail views]
+
+
+    A --> B --> C--> D --> E --> F --> H --> I
+    F --> G
+    G --> F
+
+```
 
 ## To get started, please perform the following:
 1. Create a new Fabric Workspace (for example, "Copilot Observability").
@@ -28,4 +47,3 @@ This repository contains the following items in the fabric subfolder, which will
 - **Copilot Chat History Report**: This report uses the Copilot Chat History Semantic Model and contains two main pages:
     - **Conversation Summary Page**: A high-level dashboard showing overall conversation history for a specified time period. You can filter by individual Copilot Studio agent and communication channel. You can also drill through to any agent to see more details on the Conversation Detail page.
     - **Conversation Detail Page**: Displays individual conversations and shows the conversation history between users and the agent.
-
