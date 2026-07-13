@@ -206,7 +206,6 @@ conversation_df_with_fields = (
         "conversation_startdate",
         "bot_conversationtranscriptidname",
         "bot_conversationtranscriptId",
-        #"conversation_part_json",
         # top-level fields on the struct
         col("conversation_part_json.channelId").alias("channelId"),
         col("conversation_part_json.text").alias("text"),

@@ -148,73 +148,6 @@ display(upsert_df)
 # META   "language_group": "synapse_pyspark"
 # META }
 
-# CELL ********************
-
-from pyspark.sql.functions import col
-
-# Get the maximum conversation_starttime from dbo.conversations
-max_row = spark.sql("""
-    SELECT MAX(conversation_starttime) AS max_conversation_starttime
-    FROM dbo.copilotconversation
-""").collect()
-
-# Set variable for use in subsequent cells
-if max_row and max_row[0]["max_conversation_starttime"] is not None:
-    max_conversation_starttime = max_row[0]["max_conversation_starttime"]
-else:
-    max_conversation_starttime = None
-
-# Print the value for inspection
-print("max_conversation_starttime:", max_conversation_starttime)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark",
-# META   "frozen": true,
-# META   "editable": false
-# META }
-
-# MARKDOWN ********************
-
-# ### Load new conversation transcript data from Dataverse
-# This cell builds and runs a SQL query against the Dataverse Lakehouse (`{lakehousename}`) to read from the `conversationtranscript` table. If `max_conversation_starttime` is available, it applies a `WHERE conversationstarttime > max_conversation_starttime` filter to load only new or updated conversations (incremental load). The result is stored in the `ct_df` DataFrame, ordered by `conversationstarttime` (most recent first).
-
-# CELL ********************
-
-from pyspark.sql.functions import col
-
-# Build optional WHERE clause using max_conversation_starttime (if available)
-if 'max_conversation_starttime' in globals() and max_conversation_starttime is not None:
-    where_clause = f"WHERE conversationstarttime > '{max_conversation_starttime}'"
-else:
-    where_clause = ""
-
-query = f"""
-SELECT
-  id,
-  conversationstarttime AS conversation_starttime,
-  DATE(conversationstarttime) AS conversation_startdate,
-  bot_conversationtranscriptidname,
-  bot_conversationtranscriptId,
-  content
-FROM {lakehousename}.conversationtranscript
-{where_clause}
-ORDER BY conversationstarttime DESC
-"""
-ct_df = spark.sql(query)
-display(ct_df)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark",
-# META   "frozen": true,
-# META   "editable": false
-# META }
-
 # MARKDOWN ********************
 
 # ### Parse JSON `content` column and flatten top-level fields
@@ -350,7 +283,6 @@ conversation_df_with_fields = (
         "conversation_startdate",
         "bot_conversationtranscriptidname",
         "bot_conversationtranscriptId",
-        #"conversation_part_json",
         # top-level fields on the struct
         col("conversation_part_json.channelId").alias("channelId"),
         col("conversation_part_json.text").alias("text"),
