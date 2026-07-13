@@ -27,11 +27,13 @@
 # MARKDOWN ********************
 
 # ### Parameters – Lakehouse name
-# Sets the `lakehousename` variable used to build SQL queries against the Dataverse Lakehouse...
+# Sets the `lakehousename` variable used to build SQL queries against the Dataverse Lakehouse.
+# Set the time zone adjustment for times in your timezone
 
 # PARAMETERS CELL ********************
 
 lakehousename = "dataverse_contosojbend_cds2_workspace_unq1d69ab079f7ff011a7007c1e52172"
+timezone_adjustment = "-4"
 
 # METADATA ********************
 
@@ -195,14 +197,15 @@ display(conversation_df)
 
 # CELL ********************
 
-from pyspark.sql.functions import col, from_unixtime
+from pyspark.sql.functions import col, from_unixtime, expr
 
 # conversation_part_json is a STRUCT, so we access its fields directly instead of using get_json_object
 conversation_df_with_fields = (
     conversation_df
     .select(
         "id",
-        "conversation_starttime",
+        # Adjust conversation_starttime by timezone offset
+        expr(f"conversation_starttime + INTERVAL {timezone_adjustment} HOURS").alias("conversation_starttime"),
         "conversation_startdate",
         "bot_conversationtranscriptidname",
         "bot_conversationtranscriptId",
@@ -215,14 +218,14 @@ conversation_df_with_fields = (
         col("conversation_part_json.from.id").alias("from_id"),
         col("conversation_part_json.from.role").alias("from_role"),
     )
-    # Convert epoch seconds to timestamp (if populated)
+    # Convert epoch seconds to timestamp and adjust by timezone offset
     .withColumn(
         "conversation_part_starttime",
-        from_unixtime(col("conversation_part_timestamp")).cast("timestamp")
+        from_unixtime(col("conversation_part_timestamp")).cast("timestamp") + expr(f"INTERVAL {timezone_adjustment} HOURS")
     )
 )
 
-# Order the results by the millisecond-based timestamp (most recent first)
+# Order the results by the message timestamp (most recent first)
 conversation_df_with_fields = conversation_df_with_fields.orderBy(col("conversation_part_starttime").desc())
 
 display(conversation_df_with_fields)
