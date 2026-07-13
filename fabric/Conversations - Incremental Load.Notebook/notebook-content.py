@@ -42,8 +42,111 @@ lakehousename = "dataverse_contosojbend_cds2_workspace_unq1d69ab079f7ff011a7007c
 
 # MARKDOWN ********************
 
-# ### Determine last loaded conversation start time
-# This cell queries the existing `dbo.copilotconversation` table in the default Lakehouse to find the latest `conversation_starttime`. The result is stored in `max_conversation_starttime` and will be used as a watermark for incremental loading of new conversations from Dataverse.
+# ### Load to Curated & Advance Checkpoint
+# Append the transformed records to the gold target table, then update the stored baseline version so the next run picks up only newer changes.
+
+# CELL ********************
+
+# Retrieve the baseline version stored by the initial load notebook
+baseline_row = spark.sql(f"SHOW TBLPROPERTIES copilotconversation ('cdf.baseline_version')").collect()
+
+if not baseline_row or baseline_row[0]["value"].startswith("Table"):
+    raise Exception(
+        f"No 'cdf.baseline_version' property found on copilotconversation. "
+        "Run the Initial Ingestion notebook first to establish the baseline."
+    )
+
+baseline_version = int(baseline_row[0]["value"])
+start_version = baseline_version + 1
+print(f"Reading CDF from '{lakehousename}'.conversationtranscript starting at version {start_version}")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Read Change Data Feed from source
+# Reads the Delta Change Data Feed from `{lakehousename}.conversationtranscript` starting at `start_version` (one above the stored baseline). The CDF reader returns all change records along with metadata columns (`_change_type`, `_commit_version`, `_commit_timestamp`).
+# 
+# If no change records are found (count == 0), the notebook exits early via `dbutils.notebook.exit()` to avoid unnecessary processing downstream.
+
+# CELL ********************
+
+from pyspark.sql.functions import col, array
+from delta.tables import DeltaTable
+
+table_name = f"{lakehousename}.conversationtranscript"
+
+# Get the current latest version of the table
+delta_table = DeltaTable.forName(spark, table_name)
+latest_version = (
+    delta_table.history(1)
+    .select("version")
+    .collect()[0][0]
+)
+
+print(f"Latest table version: {latest_version}, requested start_version: {start_version}")
+
+# If start_version is beyond the latest committed version, there's nothing new
+if start_version > latest_version:
+    notebookutils.notebook.exit("No new changes to process.")
+
+# Safe to read change data feed now
+cdf_df = (
+    spark.read.format("delta")
+    .option("readChangeFeed", "true")
+    .option("startingVersion", start_version)
+    .table(table_name)
+)
+
+change_count = cdf_df.count()
+print(f"Found {change_count} change records to process starting from version {start_version}")
+
+if change_count == 0:
+    notebookutils.notebook.exit("No new changes to process.")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Filter for insert records and select columns
+# Filters `cdf_df` to retain only rows where `_change_type == "insert"` — updates and deletes are not expected in this pipeline. Projects the key metadata columns (`id`, `conversation_starttime`, `conversation_startdate`, `bot_conversationtranscriptidname`, `bot_conversationtranscriptId`, `content`) and wraps the `content` string column in a single-element `array()` so the downstream JSON parsing cell can uniformly index it as `content[0]`, matching the initial load structure.
+
+# CELL ********************
+
+from pyspark.sql.functions import col
+
+# Filter for insert records only — no updates or deletes expected
+upsert_df = cdf_df.filter(
+    col("_change_type") == "insert"
+).select(
+    "id",
+    col("conversationstarttime").alias("conversation_starttime"),
+    col("conversationstarttime").cast("date").alias("conversation_startdate"),
+    "bot_conversationtranscriptidname",
+    "bot_conversationtranscriptId",
+    "content"  # keep as-is; can be parsed into a STRUCT in the JSON parsing step
+)
+
+print(f"New inserts: {upsert_df.count()}")
+display(upsert_df)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # CELL ********************
 
@@ -68,7 +171,9 @@ print("max_conversation_starttime:", max_conversation_starttime)
 
 # META {
 # META   "language": "python",
-# META   "language_group": "synapse_pyspark"
+# META   "language_group": "synapse_pyspark",
+# META   "frozen": true,
+# META   "editable": false
 # META }
 
 # MARKDOWN ********************
@@ -105,7 +210,9 @@ display(ct_df)
 
 # META {
 # META   "language": "python",
-# META   "language_group": "synapse_pyspark"
+# META   "language_group": "synapse_pyspark",
+# META   "frozen": true,
+# META   "editable": false
 # META }
 
 # MARKDOWN ********************
@@ -121,7 +228,7 @@ from pyspark.sql.functions import col, from_json, schema_of_json
 
 # 1. Sample one non-null JSON string from the `content` column to infer schema
 sample_row = (
-    ct_df
+    upsert_df
     .where(col("content").isNotNull())
     .select("content")
     .limit(1)
@@ -130,7 +237,7 @@ sample_row = (
 
 if not sample_row:
     # No JSON to parse – create an empty DataFrame with same non-JSON columns
-    parsed_df = ct_df.select("conversationstarttime", "bot_conversationtranscriptidname")
+    parsed_df = upsert_df.select("conversationstarttime", "bot_conversationtranscriptidname")
 else:
     sample_json = sample_row[0]["content"]
 
@@ -138,7 +245,7 @@ else:
     json_schema = schema_of_json(sample_json)
 
     # 3. Parse JSON into a struct column
-    ct_with_json = ct_df.withColumn("content_json", from_json(col("content"), json_schema))
+    ct_with_json = upsert_df.withColumn("content_json", from_json(col("content"), json_schema))
 
     # 4. Flatten JSON fields into top-level columns, keeping original fields as needed
     parsed_df = ct_with_json.select(
@@ -243,7 +350,7 @@ conversation_df_with_fields = (
         "conversation_startdate",
         "bot_conversationtranscriptidname",
         "bot_conversationtranscriptId",
-        "conversation_part_json",
+        #"conversation_part_json",
         # top-level fields on the struct
         col("conversation_part_json.channelId").alias("channelId"),
         col("conversation_part_json.text").alias("text"),
@@ -356,6 +463,35 @@ display(conversation_with_user)
 conversation_with_user.write.mode("append").saveAsTable("copilotconversation")
 
 spark.sql(f"REFRESH TABLE dbo.copilotconversation")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Advance CDF baseline checkpoint
+# Captures the current (latest) version of the source table via `DESCRIBE HISTORY` and stores it as the `cdf.baseline_version` table property on the target table. The next incremental run will read CDF starting at this version + 1, ensuring no changes are double-processed or missed.
+
+# CELL ********************
+
+# Update the stored baseline version to the current latest version of the source table
+latest_version = (
+    spark.sql(f"DESCRIBE HISTORY {lakehousename}.conversationtranscript LIMIT 1")
+    .select("version")
+    .collect()[0]["version"]
+)
+
+spark.sql(f"""
+    ALTER TABLE copilotconversation
+    SET TBLPROPERTIES ('cdf.baseline_version' = '{latest_version}')
+""")
+
+print(f"Updated cdf.baseline_version to {latest_version}")
+print(f"Next run will start at version {latest_version + 1}")
 
 # METADATA ********************
 

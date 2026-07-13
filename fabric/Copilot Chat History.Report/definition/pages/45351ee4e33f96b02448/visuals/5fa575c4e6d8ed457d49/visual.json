@@ -30,9 +30,9 @@
                   "Function": 2
                 }
               },
-              "queryRef": "Min(copilotconversation.Conversation Id)",
-              "nativeQueryRef": "Conversation Total",
-              "displayName": "Conversation Total"
+              "queryRef": "Min(copilotconversation.Conversation Id)1",
+              "nativeQueryRef": "Total Conversations",
+              "displayName": "Total Conversations"
             }
           ]
         }
@@ -124,5 +124,28 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e87d5dfd06890a5fe6c4",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "copilotconversation"
+                  }
+                },
+                "Property": "Conversation Id"
+              }
+            },
+            "Function": 2
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

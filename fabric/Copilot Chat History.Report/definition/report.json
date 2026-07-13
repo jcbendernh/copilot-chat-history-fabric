@@ -50,17 +50,6 @@
   },
   "resourcePackages": [
     {
-      "name": "SharedResources",
-      "type": "SharedResources",
-      "items": [
-        {
-          "name": "CY26SU05",
-          "path": "BaseThemes/CY26SU05.json",
-          "type": "BaseTheme"
-        }
-      ]
-    },
-    {
       "name": "RegisteredResources",
       "type": "RegisteredResources",
       "items": [
@@ -72,12 +61,23 @@
         {
           "name": "Copilot_Theme2524436361134559.json",
           "path": "Copilot_Theme2524436361134559.json",
-          "type": "CustomTheme"
+          "type": "Image"
         },
         {
           "name": "Fabric_Transparent6348477342697747.png",
           "path": "Fabric_Transparent6348477342697747.png",
           "type": "Image"
+        }
+      ]
+    },
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU05",
+          "path": "BaseThemes/CY26SU05.json",
+          "type": "BaseTheme"
         }
       ]
     }

@@ -58,7 +58,7 @@
             "endDate": {
               "expr": {
                 "Literal": {
-                  "Value": "datetime'2026-06-20T00:00:00'"
+                  "Value": "datetime'2026-07-07T00:00:00'"
                 }
               }
             },
@@ -102,7 +102,7 @@
                         },
                         "Right": {
                           "Literal": {
-                            "Value": "datetime'2026-06-21T00:00:00'"
+                            "Value": "datetime'2026-07-08T00:00:00'"
                           }
                         }
                       }

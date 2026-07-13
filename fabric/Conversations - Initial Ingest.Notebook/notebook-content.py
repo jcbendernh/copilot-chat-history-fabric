@@ -27,7 +27,7 @@
 # MARKDOWN ********************
 
 # ### Parameters – Lakehouse name
-# Sets the `lakehousename` variable used to build SQL queries against the Dataverse Lakehouse.
+# Sets the `lakehousename` variable used to build SQL queries against the Dataverse Lakehouse...
 
 # PARAMETERS CELL ********************
 
@@ -206,7 +206,7 @@ conversation_df_with_fields = (
         "conversation_startdate",
         "bot_conversationtranscriptidname",
         "bot_conversationtranscriptId",
-        "conversation_part_json",
+        #"conversation_part_json",
         # top-level fields on the struct
         col("conversation_part_json.channelId").alias("channelId"),
         col("conversation_part_json.text").alias("text"),
@@ -321,6 +321,35 @@ display(conversation_with_user)
 conversation_with_user.write.option("overwriteSchema", "true").mode("overwrite").saveAsTable("copilotconversation")
 
 spark.sql(f"REFRESH TABLE dbo.copilotconversation")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Capture the current (latest) version of the source table.
+# Gets the current version of the source table and store the baseline version as a table property on the target for the incremental notebook to reference
+
+# CELL ********************
+
+latest_version = (
+    spark.sql(f"DESCRIBE HISTORY {lakehousename}.conversationtranscript LIMIT 1")
+    .select("version")
+    .collect()[0]["version"]
+)
+
+spark.sql(f"""
+    ALTER TABLE copilotconversation
+    SET TBLPROPERTIES ('cdf.baseline_version' = '{latest_version}')
+""")
+
+print(f"Source table '{lakehousename}'.conversationtranscript current version: {latest_version}")
+print(f"Stored as TBLPROPERTY 'cdf.baseline_version' on copilotconversation")
+print(f"Incremental notebook should use: startingVersion = {latest_version + 1}")
 
 # METADATA ********************
 
