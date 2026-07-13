@@ -268,7 +268,7 @@ display(conversation_df)
 
 # CELL ********************
 
-from pyspark.sql.functions import col, from_unixtime
+from pyspark.sql.functions import col, from_unixtime, expr
 
 # conversation_part_json is a STRUCT, so we access its fields directly instead of using get_json_object
 conversation_df_with_fields = (
