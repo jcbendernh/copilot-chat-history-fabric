@@ -12,6 +12,7 @@ Below are sample screenshots of the report.
 
 ### High Level Architecture and Process Flow
 ```mermaid
+%%{init: {"themeVariables": {"fontSize": "12px"}}}%%
 flowchart TD
 	A[Create Fabric Workspace] 
 	B[Connect Git repo to Workspace]
