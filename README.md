@@ -17,10 +17,10 @@ flowchart TD
 	A[Create Fabric Workspace] 
 	B[Connect Git repo to Workspace]
 	C[Deploy workspace artifacts via Source Control in Git]
-	D[Set up Dataverse Link to Fabric<BR>Dataverse shortcut tables available in Fabric]
-	E[Run Initial Ingest Notebook<BR>Transform and load to<br/>curated Conversations table]
+	D[Set up Dataverse Link to Fabric<br/>Dataverse shortcut tables<br/>available in Fabric]
+	E[Run Initial Ingest Notebook<br/>Transform and load to<br/>curated Conversations table]
     F[Conversations Table<br/>Curated analytics-ready conversation history]
-	G[Schedule Incremental Load Notebook<BR>Append only new conversation records]
+	G[Schedule Incremental Load Notebook<br/>Append only new <br/>conversation records]
 	H[Semantic Model maps fields<br/>to report-friendly names]
     I[Copilot Chat History Report<br/>Summary and Detail views]
 
